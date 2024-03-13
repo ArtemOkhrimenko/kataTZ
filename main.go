@@ -1,22 +1,29 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 	"strconv"
+	"strings"
 )
 
 func main() {
-	var operand1 string
-	var operator string
-	var operand2 string
+	text, _ := bufio.NewReader(os.Stdin).ReadString('\n')
+	res := strings.Split(text, " ")
 
-	fmt.Scan(&operand1, &operator, &operand2)
+	if len(res) > 3 {
+		panic("too many arguments")
+	}
 
-	result, class, err := calculate(operand1, operator, operand2)
+	result, class, err := calculate(res[0], res[1], res[2])
 	if err != nil {
 		fmt.Println("Error:", err)
 	}
 	if class == "Rome" {
+		if result <= 0 {
+			panic("roman numeral cannot be less I")
+		}
 		res := convertToArabic(result)
 		fmt.Println("Result:", res)
 	}
@@ -31,7 +38,6 @@ func calculate(op1, operator, op2 string) (int, string, error) {
 	class = "Arabic"
 	if err != nil {
 		class = "Rome"
-		fmt.Println(class)
 		operand1, operand2, err = convertOperandRome(op1, op2)
 		if err != nil {
 			panic("not valid value")
@@ -56,12 +62,12 @@ func calculate(op1, operator, op2 string) (int, string, error) {
 }
 
 func convertOperandArabic(op1, op2 string) (operand1, operand2 int, err error) {
-	operand1, err = strconv.Atoi(op1)
+	operand1, err = strconv.Atoi(strings.TrimSpace(op1))
 	if err != nil {
 		return 0, 0, err
 	}
 
-	operand2, err = strconv.Atoi(op2)
+	operand2, err = strconv.Atoi(strings.TrimSpace(op2))
 	if err != nil {
 		return 0, 0, err
 	}
@@ -79,11 +85,11 @@ func convertOperandRome(op1, op2 string) (operand1, operand2 int, err error) {
 		"VI": 6, "VII": 7, "VIII": 8, "IX": 9, "X": 10,
 	}
 
-	if val, ok := romanMap[op1]; ok {
+	if val, ok := romanMap[strings.TrimSpace(op1)]; ok {
 		operand1 = val
 	}
 
-	if val, ok := romanMap[op2]; ok {
+	if val, ok := romanMap[strings.TrimSpace(op2)]; ok {
 		operand2 = val
 	}
 
